@@ -1,13 +1,9 @@
 <?php
     class Contact {
         private $contact;
-        private $custom;
 
         public function __construct(){
             $this->contact = array();
-
-            $this->contact['custom_fields'] = array();
-            $this->custom = &$this->contact['custom_fields'];
         }
 
         public function setName($name){
@@ -23,33 +19,40 @@
         }
 
         public function addLinkedLeads($addLeads){
-            $leads = $this->constact['linked_leads_id'];
+            $leads = $this->contact['linked_leads_id'];
+            if(!$leads) $leads = array();
+
             if(!is_array($addLeads)) $leads[] = $addLeads;
             else $leads = array_merge($leads, $addLeads);
 
-            $this->constact['linked_leads_id'] = $leads;
+            $this->contact['linked_leads_id'] = $leads;
+
             return $this;
         }
 
         public function setCustomFields($fields){
             if(!is_array($fields)) return $this;
-            foreach ($fields as $key => $field) {
-                $this->custom[]=$field;
-            }
+            $this->constact['custom_fields'] = $fields;
 
             return $this;
         }
 
-        public function setCustomField($id, $value, $enum = null){
+        public function addCustomField($id, $value, $enum = null){
             $field = array('id' => $id);
-            $field['values'] = is_array($value) ? $value :
+            $field['values'][] = is_array($value) ? $value :
                     array('value' => $value, 'enum' => $enum);
-            $this->custom[] = $field;
+
+            $custom = $this->contact['custom_fields'];
+            if(!$custom) $custom = array();
+
+            $custom[] = $field;
+            $this->contact['custom_fields'] = $custom;
+
             return $this;
         }
 
-        public getContactArray(){
-            return $this->lead;
+        public function getArray(){
+            return $this->contact;
         }
     }
 ?>

@@ -1,12 +1,9 @@
 <?php
     class Lead {
         private $lead;
-        private $custom;
 
         public function __construct(){
             $this->lead = array();
-            $this->lead['custom_fields'] = array();
-            $this->custom = &$this->lead['custom_fields'];
         }
 
         public function setName($name){
@@ -51,22 +48,29 @@
 
         public function setCustomFields($fields){
             if(!is_array($fields)) return $this;
-            foreach ($fields as $key => $field) {
-                $this->custom[]=$field;
-            }
-
+            $this->lead['custom_fields'] = $fields;
             return $this;
         }
 
-        public function setCustomField($id, $value, $enum = null){
+        public function addCustomField($id, $value, $enum = null){
             $field = array('id' => $id);
-            $field['values'] = is_array($value) ? $value :
-                    array('value' => $value, 'enum' => $enum);
-            $this->custom[] = $field;
+            if(is_array($value)) $field['values'][] = $value;
+            else {
+                $value = array('value' => $value);
+                if($enum) $value['enum'] = $enum;
+            }
+            $field['values'][] = $value;
+
+            $custom = $this->lead['custom_fields'];
+            if(!$custom) $custom = array();
+
+            $custom[] = $field;
+            $this->lead['custom_fields'] = $custom;
+
             return $this;
         }
 
-        public getLeadArray(){
+        public function getArray(){
             return $this->lead;
         }
     }
