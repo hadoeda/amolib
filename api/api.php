@@ -16,8 +16,11 @@
             $curl = curl_init();
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($curl, CURLOPT_USERAGENT, 'amoCRM-API-client/1.0');
+            curl_setopt($curl,CURLOPT_HTTPHEADER, array('Accept: application/json'));
             curl_setopt($curl, CURLOPT_URL, $link);
+
             if($method) curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
+
             if($data){
                 curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
                 curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
@@ -65,6 +68,23 @@
                 'POST',
                 $contactsDesc
             );
+        }
+
+        public function getUnsorted($pageSize, $page, $categories, $orderBy){
+            $link = 'https://'.$this->domain.
+                '.amocrm.ru/api/unsorted/list/'.
+                '?api_key='.$this->account['USER_HASH'].'&login='.$this->account['USER_LOGIN'].
+                "&page_size=$pageSize&PAGEN_1=$page";
+
+            foreach ($categories as $cat) {
+                $link.="&categories[]=$cat";
+            }
+
+            foreach ($orderBy as $field => $order) {
+                $link.="&order_by[$field]=$order";
+            }
+
+            return $this->execute($link);
         }
     }
 ?>
