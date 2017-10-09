@@ -32,7 +32,7 @@
 
         public function setCustomFields($fields){
             if(!is_array($fields)) return $this;
-            $this->constact['custom_fields'] = $fields;
+            $this->contact['custom_fields'] = $fields;
 
             return $this;
         }
