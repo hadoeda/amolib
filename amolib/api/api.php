@@ -16,12 +16,12 @@
             $curl = curl_init();
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($curl, CURLOPT_USERAGENT, 'amoCRM-API-client/1.0');
-            curl_setopt($curl,CURLOPT_HTTPHEADER, array('Accept: application/json'));
             curl_setopt($curl, CURLOPT_URL, $link);
 
             if($method) curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
 
             if($data){
+                curl_setopt($curl,CURLOPT_HTTPHEADER, array('Accept: application/json'));
                 curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
                 curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
             }
@@ -35,7 +35,7 @@
             $code = curl_getinfo($curl, CURLINFO_HTTP_CODE); #Получим HTTP-код ответа сервера
             curl_close($curl); #Завершаем сеанс cURL
             $code = (int)$code;
-            if($code!=200 && $code!=204) throw new ApiException($out);
+            if($code!=200 && $code!=204) throw new ApiException("CURL error code $code", $code);
 
             return json_decode($out, true);
         }
@@ -56,17 +56,54 @@
 
         public function setLeads($dealsDesc){
             return $this->execute(
-                'https://'.$this->domain.'.amocrm.ru/private/api/v2/json/leads/set',
+                'https://'.$this->domain.'.amocrm.ru/api/v2/leads',
                 'POST',
                 $dealsDesc
             );
         }
 
+        public function getLeads($ids){
+            if(!is_array($ids)) $ids = array($ids);
+
+            return $this->execute(
+                'https://'.$this->domain.'.amocrm.ru/api/v2/leads?id='.implode(',',$ids),
+                'GET'
+            );
+        }
+
         public function setContacts($contactsDesc){
             return $this->execute(
-                'https://'.$this->domain.'.amocrm.ru/private/api/v2/json/contacts/set',
+                'https://'.$this->domain.'.amocrm.ru/api/v2/contacts',
                 'POST',
                 $contactsDesc
+            );
+        }
+
+        public function getContacts($id){
+            return $this->execute(
+                'https://'.$this->domain.'.amocrm.ru/api/v2/contacts?id='.$id,
+                'GET'
+            );
+        }
+
+        public function setTasks($tasksDesc){
+            return $this->execute(
+                'https://'.$this->domain.'.amocrm.ru/private/api/v2/json/tasks/set',
+                'POST',
+                $tasksDesc  
+            );
+        }
+
+        public function getTasks($id){
+            $link ='https://'.$this->domain.'.amocrm.ru/private/api/v2/json/tasks/list?id='.$id;
+            return $this->execute($link);
+        }
+
+        public function setNotes($noteDesc){
+            return $this->execute(
+                'https://'.$this->domain.'.amocrm.ru/private/api/v2/json/notes/set',
+                'POST',
+                $noteDesc  
             );
         }
 
